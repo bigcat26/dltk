@@ -64,7 +64,7 @@ import dltk
 
 
 def folder2lmdb(folder: str, db: str, exts=['jpg', 'png']):
-    with dltk.LMDBDatabaseWriter("./db") as writer:
+    with dltk.LMDBDatabaseWriter(db) as writer:
         # LMDBDatabase
         with tqdm(total=1) as pbar:
             for root, dirs, files in os.walk(folder):
@@ -75,25 +75,32 @@ def folder2lmdb(folder: str, db: str, exts=['jpg', 'png']):
                     pbar.update(1)
                     match = reduce((lambda x, y: x or y), [name.endswith(ext) for ext in exts])
                     if not match:
+                        print(f'file {name} skipped')
                         continue
                     label = os.path.basename(root)
-                    key = f'label/{name}'
+                    key = f'{label}/{name}'
                     full_path = os.path.join(root, name)
                     # print(f'path={full_path} key={key} label={label}')
                     rec = dltk.ImageRecord.from_image(label, full_path)
                     writer.store([key], [rec])
 
     
-# folder2lmdb('/mnt/dataset/CASIA-WebFaces/datasets/', 'CASIA-WebFaces')
+folder2lmdb('/mnt/dataset/CASIA-WebFaces/datasets/', 'CASIA-WebFaces')
 
-from PIL import Image
+# def lmdb2folder(db: str, folder: str):
+#     with dltk.LMDBDatabaseReader(db) as reader:
+#         print(len(reader))
 
-with dltk.LMDBDatabaseReader("./db") as reader:
-    print(f'len = {len(reader)}')
-    rec = dltk.ImageRecord.loads(reader[0])
-    print(f'0 label={rec.get_label()}')
-    im = Image.fromarray(rec.get_image())
-    im.save('hi.jpg')
+
+# lmdb2folder('CASIA-WebFaces', 'extract')
+# from PIL import Image
+
+# with dltk.LMDBDatabaseReader("./db") as reader:
+#     print(f'len = {len(reader)}')
+#     rec = dltk.ImageRecord.loads(reader[0])
+#     print(f'0 label={rec.get_label()}')
+#     im = Image.fromarray(rec.get_image())
+#     im.save('hi.jpg')
 
 
 # rec = dltk.ImageRecord.from_image('label', '/mnt/dataset/lfw-pairs/lfw_funneled/Frank_Zappa/Frank_Zappa_0001.jpg')
