@@ -5,9 +5,9 @@ from .interface.database_writer import DatabaseWriter
 class LMDBDatabaseWriter(DatabaseWriter):
     def __init__(self, path: str, map_size: int = 1099511627776):
         self.path = path
+        self.map_size = map_size
         self.txn = None
         self.env = None
-        self.map_size = map_size
 
     def store(self, key: list[str], record: list[Record]):
         for i in range(len(key)):

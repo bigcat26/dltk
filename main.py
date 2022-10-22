@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 import os
 import argparse
-from tqdm import tqdm
 from functools import reduce
+from tqdm import tqdm
+
+import dltk
 
 # https://zhuanlan.zhihu.com/p/388983712
 
-import dltk
 
 # def data2lmdb(dpath, name="train", write_frequency=5000, num_workers=8):
 #     # 获取自定义的COCO数据集（就是最原始的那个直接从磁盘读取image的数据集）

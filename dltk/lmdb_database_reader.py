@@ -2,10 +2,13 @@ import lmdb
 from .interface.record import Record
 from .interface.database_reader import DatabaseReader
 
-class LMDBDatabaseReader(DatabaseReader):    
+class LMDBDatabaseReader(DatabaseReader):
     def __init__(self, path: str, map_size: int = 1099511627776):
         self.path = path
         self.map_size = map_size
+        self.txn = None
+        self.env = None
+        self.keys = list()
 
     def _rebuild_index_cache(self):
         with self.env.begin(write=False) as txn:
@@ -25,8 +28,7 @@ class LMDBDatabaseReader(DatabaseReader):
         return self.env.stat()['entries']
 
     def __repr__(self):
-        return self.__class__.__name__ + ' (' + self.db_path + ')'
+        return self.__class__.__name__ + ' (' + self.path + ')'
 
-    def __getitem__(self, index):
+    def __getitem__(self, index) -> Record:
         return self.txn.get(self.keys[index])
-
