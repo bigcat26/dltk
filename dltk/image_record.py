@@ -21,7 +21,7 @@ class ImageRecord(Record):
         return pickle.dumps(self)
 
     def __repr__(self):
-        return f'{self.__class__.__name__} (image channels={self.channels} size={self.size} len={len(self.data)})'
+        return f'{self.__class__.__name__} (channels={self.channels} size={self.size} len={len(self.data)})'
 
     @staticmethod
     def loads(data):

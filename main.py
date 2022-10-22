@@ -1,32 +1,12 @@
-# from folder2lmdb import ImageFolderLMDB 
+#!/usr/bin/env python3
 import os
-import cv2
 import argparse
-import lmdb
-import time
 from tqdm import tqdm
 from functools import reduce
 
 # https://zhuanlan.zhihu.com/p/388983712
 
 import dltk
-
-
-# class Image:
-    # def __init__(self, label, image):
-    #     # Dimensions of image for reconstruction - not really necessary 
-    #     # for this dataset, but some datasets may include images of 
-    #     # varying sizes
-    #     self.channels = image.shape[2]
-    #     self.size = image.shape[:2]
-
-    #     self.image = image.tobytes()
-    #     self.label = label
- 
-    # def get_image(self):
-    #     """ Returns the image as a numpy array. """
-    #     image = np.frombuffer(self.image, dtype=np.uint8)
-    #     return image.reshape(*self.size, self.channels)
 
 # def data2lmdb(dpath, name="train", write_frequency=5000, num_workers=8):
 #     # 获取自定义的COCO数据集（就是最原始的那个直接从磁盘读取image的数据集）
@@ -62,18 +42,17 @@ import dltk
 #     db.close()
 
 
-
 def folder2lmdb(folder: str, db: str, exts=['jpg', 'png']):
     with dltk.LMDBDatabaseWriter(db) as writer:
-        # LMDBDatabase
         with tqdm(total=1) as pbar:
-            for root, dirs, files in os.walk(folder):
+            for root, _, files in os.walk(folder):
                 pbar.total += len(files)
                 pbar.refresh()
                 # print(f'root={root} basename={os.path.basename(root)}')
                 for name in files:
                     pbar.update(1)
-                    match = reduce((lambda x, y: x or y), [name.endswith(ext) for ext in exts])
+                    match = reduce((lambda x, y: x or y), [
+                                   name.endswith(ext) for ext in exts])
                     if not match:
                         print(f'file {name} skipped')
                         continue
@@ -84,13 +63,12 @@ def folder2lmdb(folder: str, db: str, exts=['jpg', 'png']):
                     rec = dltk.ImageRecord.from_image(label, full_path)
                     writer.store([key], [rec])
 
-    
+
 folder2lmdb('/mnt/dataset/CASIA-WebFaces/datasets/', 'CASIA-WebFaces')
 
 # def lmdb2folder(db: str, folder: str):
 #     with dltk.LMDBDatabaseReader(db) as reader:
 #         print(len(reader))
-
 
 # lmdb2folder('CASIA-WebFaces', 'extract')
 # from PIL import Image
@@ -103,15 +81,13 @@ folder2lmdb('/mnt/dataset/CASIA-WebFaces/datasets/', 'CASIA-WebFaces')
 #     im.save('hi.jpg')
 
 
-# rec = dltk.ImageRecord.from_image('label', '/mnt/dataset/lfw-pairs/lfw_funneled/Frank_Zappa/Frank_Zappa_0001.jpg')
-# import cv2
-# cv2img = cv2.
-
 def main():
     parser = argparse.ArgumentParser(description='folder2lmdb')
 
-    parser.add_argument('-i', '--input', type=str, help='input image folder path')
-    parser.add_argument('-o', '--output', default='db', type=str, help='output database path')
+    parser.add_argument('-i', '--input', type=str,
+                        help='input image folder path')
+    parser.add_argument('-o', '--output', default='db',
+                        type=str, help='output database path')
     parser.add_argument('-e', '--exts-list', default=['png', 'jpg'])
 
     # parser.add_argument('--network', default='resnet50', help='Backbone network mobile0.25 or resnet50')
@@ -124,14 +100,14 @@ def main():
     # parser.add_argument('--vis_thres', default=0.6, type=float, help='visualization_threshold')
     # parser.add_argument('folders', nargs='*', help='input ')
     args = parser.parse_args()
-    
+
     if not args.input:
         raise ValueError("invalid input parameter")
-    
+
     if not args.output:
         raise ValueError("invalid output parameter")
-    
-    
+
+
 if __name__ == '__main__':
     # img = cv2.imread('../FaceProject/third_party/opencv/doc/tutorials/viz/images/facedetect.jpg')
     # rec = NumpyDataRecord("l", "d")
@@ -148,4 +124,3 @@ if __name__ == '__main__':
     # loader = DataLoader(dst, batch_size=2)
     # for x in loader:
     #     print(x.shape)
-
