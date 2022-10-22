@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="dltk",
-    version="0.1",
+    version="%VERSION%",
     keywords=("pip", "dltk"),
     description="Deeplearning Toolkit",
     long_description="Deeplearning Toolkit",
