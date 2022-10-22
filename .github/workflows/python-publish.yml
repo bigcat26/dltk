@@ -37,7 +37,7 @@ jobs:
     - name: Generate setup.py
       run: sed "s/%VERSION%/$(git describe --tags --match v* | cut -d 'v' -f 2)/" setup.py.in > setup.py
 
-    - name: Tag
+    - name: Get Tag
       run: echo "::set-output name=tag::$(git describe --tags --abbrev=8 --long --dirty)"
       id: tag
 
@@ -50,12 +50,24 @@ jobs:
     #     user: __token__
     #     password: ${{ secrets.PYPI_API_TOKEN }}
 
+    - name: Create Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      id: create_release
+      with:
+        draft: false
+        prerelease: true
+        release_name: ${{ steps.tag.outputs.tag }}
+        tag_name: ${{ github.ref }}
+#        body_path: CHANGELOG.md
+
     - name: publish artifact
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: dltk-${{ steps.Tag.outputs.tag }}.py3-none-any.whl
-        asset_name: dltk-${{ steps.Tag.outputs.tag }}.py3-none-any.whl
+        asset_path: dltk-${{ steps.tag.outputs.tag }}.py3-none-any.whl
+        asset_name: dltk-${{ steps.tag.outputs.tag }}.py3-none-any.whl
         asset_content_type: application/zip
