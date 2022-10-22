@@ -35,16 +35,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install build
 
-    - name: Get Git Tag
-      run: git describe --tags --abbrev=8 --long --dirty
+    - name: Git Tag
+      run: echo "git_tag=$(git describe --tags --abbrev=8 --long --dirty)" >> $GITHUB_OUTPUT
       id: tag
 
-    - name: Get Git Version
-      run: git describe --tags --match v* | cut -d 'v' -f 2
-      id: gitversion
+    - name: Git Version
+      run: echo "git_version=$(git describe --tags --match v* | cut -d 'v' -f 2)" >> $GITHUB_OUTPUT
+      id: version
 
     - name: Generate setup.py
-      run: sed "s/%VERSION%/${{ steps.gitversion.outputs.* }}/" setup.py.in > setup.py
+      run: sed "s/%VERSION%/${{ steps.version.outputs.git_version }}/" setup.py.in > setup.py
 
     - name: Build package
       run: python -m build
@@ -63,7 +63,7 @@ jobs:
       with:
         draft: true
         prerelease: false
-        release_name: ${{ steps.tag.outputs.* }}
+        release_name: ${{ steps.tag.outputs.git_tag }}
         tag_name: ${{ github.ref }}
 #        body_path: CHANGELOG.md
 
@@ -73,6 +73,6 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: dltk-${{ steps.gitversion.outputs.* }}.py3-none-any.whl
-        asset_name: dltk-${{ steps.gitversion.outputs.* }}.py3-none-any.whl
+        asset_path: dist/dltk-${{ steps.version.outputs.git_version }}-py3-none-any.whl
+        asset_name: dltk-${{ steps.version.outputs.git_version }}-py3-none-any.whl
         asset_content_type: application/zip
