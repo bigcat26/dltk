@@ -38,7 +38,7 @@ jobs:
       run: sed "s/%VERSION%/$(git describe --tags --match v* | cut -d 'v' -f 2)/" setup.py.in > setup.py
 
     - name: Get Tag
-      run: echo "::set-output name=tag::$(git describe --tags --abbrev=8 --long --dirty)"
+      run: git describe --tags --abbrev=8 --long --dirty
       id: tag
 
     - name: Build package
