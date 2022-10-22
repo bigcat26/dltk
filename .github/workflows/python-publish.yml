@@ -8,10 +8,11 @@
 
 name: Build Python Package
 
-on: [push]
-  # push:
-  #     tags: 
-  #       - '**'
+# on: [push]
+on:
+  push:
+      tags: 
+        - '**'
 
 permissions:
   contents: write
