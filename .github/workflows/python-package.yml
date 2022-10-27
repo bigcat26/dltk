@@ -11,8 +11,9 @@ name: Build Python Package
 # on: [push]
 on:
   push:
-      tags: 
-        - '**'
+    branches: [master, release]
+    tags:
+      - 'v*'
 
 permissions:
   contents: write
@@ -20,7 +21,7 @@ permissions:
 jobs:
   deploy:
 
-    runs-on: ubuntu-latest
+    runs-on: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
     - uses: actions/checkout@v3
@@ -62,7 +63,7 @@ jobs:
       id: create_release
       with:
         draft: true
-        prerelease: false
+        prerelease: true
         release_name: ${{ steps.tag.outputs.git_tag }}
         tag_name: ${{ github.ref }}
 #        body_path: CHANGELOG.md
