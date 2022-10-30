@@ -1,4 +1,1 @@
-build/
-__pycache__/
-*.egg-info/
-*.whl
+setup.py

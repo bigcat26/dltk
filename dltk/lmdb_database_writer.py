@@ -1,6 +1,6 @@
 import lmdb
-from .interface.record import Record
-from .interface.database_writer import DatabaseWriter
+from .data.record import Record
+from .data.database_writer import DatabaseWriter
 
 class LMDBDatabaseWriter(DatabaseWriter):
     def __init__(self, path: str, map_size: int = 1099511627776):
@@ -10,10 +10,14 @@ class LMDBDatabaseWriter(DatabaseWriter):
         self.env = None
 
     def store(self, key: list[str], record: list[Record]):
+        success = 0
         for i in range(len(key)):
-            self.txn.put(key[i].encode("ascii"), record[i].dumps())
+            if self.txn.put(key[i].encode("ascii"), record[i].dumps()):
+                success += 1
+        return success
 
     def abort(self):
+        print(f'abort!')
         self.txn.abort()
         self.txn = None
 
@@ -26,9 +30,6 @@ class LMDBDatabaseWriter(DatabaseWriter):
         return self
 
     def __exit__(self, exception_type, exception_value, traceback):
-        if self.txn:
-            self.txn.commit()
-            self.txn = None
         self.env.sync()
         self.env.close()
 

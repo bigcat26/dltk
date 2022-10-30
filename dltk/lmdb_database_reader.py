@@ -1,34 +1,53 @@
+import copy
 import lmdb
-from .interface.record import Record
-from .interface.database_reader import DatabaseReader
+import numpy as np
+from .data.record import Record
+from .data.database_reader import DatabaseReader
 
 class LMDBDatabaseReader(DatabaseReader):
     def __init__(self, path: str, map_size: int = 1099511627776):
-        self.path = path
-        self.map_size = map_size
-        self.txn = None
-        self.env = None
-        self.keys = list()
+        self._path = path
+        self._env = lmdb.open(self._path, map_size=map_size)
+        self._txn = self._env.begin(write=False)
+        self._rebuild_index_cache()
 
     def _rebuild_index_cache(self):
-        with self.env.begin(write=False) as txn:
-            self.keys = list(txn.cursor().iternext(values=False))
+        self._keys = list(self._txn.cursor().iternext(values=False))
 
-    def __enter__(self):
-        self.env = lmdb.open(self.path, map_size=self.map_size)
-        self.txn = self.env.begin(write=False)
-        self._rebuild_index_cache()
-        return self
+    def close(self):
+        self._env.close()
 
-    def __exit__(self, exception_type, exception_value, traceback):
-        self.keys = list()
-        self.env.close()
+    # def __enter__(self):
+    #     return self
+
+    # def __exit__(self, exception_type, exception_value, traceback):
+    #     pass
 
     def __len__(self):
-        return self.env.stat()['entries']
+        return len(self._keys)
 
     def __repr__(self):
-        return self.__class__.__name__ + ' (' + self.path + ')'
+        return self.__class__.__name__ + ' (' + self._path + ')'
 
     def __getitem__(self, index) -> Record:
-        return self.txn.get(self.keys[index])
+        return self._txn.get(self._keys[index])
+
+    def shuffle(self):
+        np.random.seed(10101)
+        np.random.shuffle(self._keys)
+        np.random.seed(None)
+
+    def split(self, ratio):
+        keys_total = len(self._keys)
+        ratio_total = sum(ratio)
+        prev_size = 0
+        dataset = []
+        for i in range(len(ratio)):
+            cur_size = prev_size + int(keys_total * ratio[i] / ratio_total)
+            dataset_id = len(dataset)
+            dataset.append(copy.copy(self))
+            dataset[dataset_id]._keys = copy.deepcopy(self._keys)[prev_size:cur_size]
+            # print(f'range={prev_size}-{cur_size}, len={len(dataset[dataset_id]._keys)}')
+            prev_size = cur_size
+
+        return dataset

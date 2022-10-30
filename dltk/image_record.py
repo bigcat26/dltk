@@ -1,7 +1,7 @@
 import pickle
 import numpy as np
 from PIL import Image
-from .interface import Record
+from .data import Record
 
 class ImageRecord(Record):
     def __init__(self, label, image: np.array):
