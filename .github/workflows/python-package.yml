@@ -37,9 +37,10 @@ jobs:
         pip install build
 
     - name: Get Version
-      run: echo "tag=$(git describe --tags --abbrev=8 --long --dirty)" >> $GITHUB_OUTPUT
-      # run: echo "git=$(git describe --tags --match v* | cut -d 'v' -f 2)" >> $GITHUB_OUTPUT
-      run: echo "module=$(python -c 'import dltk; print(dltk.__version__)')" >> $GITHUB_OUTPUT
+      run: |
+        echo "tag=$(git describe --tags --abbrev=8 --long --dirty)" >> $GITHUB_OUTPUT
+        echo "git=$(git describe --tags --match v* | cut -d 'v' -f 2)" >> $GITHUB_OUTPUT
+        echo "module=$(python -c 'import dltk; print(dltk.__version__)')" >> $GITHUB_OUTPUT
       id: version
 
     - name: Generate setup.py
