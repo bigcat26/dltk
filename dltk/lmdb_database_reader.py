@@ -16,12 +16,13 @@ class LMDBDatabaseReader(DatabaseReader):
 
     def close(self):
         self._env.close()
+        self._env = None
 
-    # def __enter__(self):
-    #     return self
+    def __enter__(self):
+        return self
 
-    # def __exit__(self, exception_type, exception_value, traceback):
-    #     pass
+    def __exit__(self, exception_type, exception_value, traceback):
+        self.close()
 
     def __len__(self):
         return len(self._keys)
@@ -42,8 +43,8 @@ class LMDBDatabaseReader(DatabaseReader):
         ratio_total = sum(ratio)
         prev_size = 0
         dataset = []
-        for i in range(len(ratio)):
-            cur_size = prev_size + int(keys_total * ratio[i] / ratio_total)
+        for r in ratio:
+            cur_size = prev_size + int(keys_total * r / ratio_total)
             dataset_id = len(dataset)
             dataset.append(copy.copy(self))
             dataset[dataset_id]._keys = copy.deepcopy(self._keys)[prev_size:cur_size]

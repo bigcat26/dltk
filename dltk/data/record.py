@@ -2,7 +2,7 @@
 class Record:
     def label(self) -> str:
         return None
-    
+
     def image(self):
         return None
 
@@ -10,5 +10,5 @@ class Record:
         return None
 
     @staticmethod
-    def loads(data):
+    def loads(_):
         return None
