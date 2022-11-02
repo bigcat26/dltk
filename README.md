@@ -1,3 +1,7 @@
 # DLTK
 
-Deeplearning Toolkit
+Deep Learning Toolkit
+
+## Reference
+
+https://realpython.com/storing-images-in-python

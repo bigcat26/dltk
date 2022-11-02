@@ -34,6 +34,9 @@ class LMDBDatabaseReader(DatabaseReader):
         return self._txn.get(self._keys[index])
 
     def shuffle(self):
+        """
+        shuffle records
+        """
         np.random.seed(10101)
         np.random.shuffle(self._keys)
         np.random.seed(None)
